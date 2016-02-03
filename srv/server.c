@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Mon Feb  1 11:44:46 2016 marc brout
+** Last update Wed Feb  3 17:32:09 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -16,10 +16,22 @@
 
 void		test(int nb)
 {
+  static char	c = 0;
+  static int	i = 0;
+  char		tmp;
+
   if (nb == SIGUSR1)
-    my_printf("1\n");
+    tmp = 1;
   else
-    my_printf("0\n");
+    tmp = 0;
+  i += 1;
+  c = c | tmp << i;
+  if (i == 8)
+    {
+      my_printf("%c", c);
+      c = 0;
+      i = 0;
+    }
 }
 
 int		main()
@@ -32,6 +44,7 @@ int		main()
     {
        signal(SIGUSR1, test);
        signal(SIGUSR2, test);
+       usleep(100);
     }
   return (0);
 }

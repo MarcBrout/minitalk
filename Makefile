@@ -5,7 +5,7 @@
 ## Login   <brout_m@epitech.net>
 ## 
 ## Started on  Fri Jan 29 15:30:38 2016 marc brout
-## Last update Fri Jan 29 20:46:20 2016 marc brout
+## Last update Wed Feb  3 16:42:53 2016 marc brout
 ##
 
 SRCP	= ./srv/
@@ -26,7 +26,7 @@ NAME2	= client
 
 CC      = gcc -g
 
-CFLAGS  =  -W -Wall -Werror -ansi -pedantic
+CFLAGS  =  -W -Wall -Werror
 
 HDFLAGS = -I./include/
 
