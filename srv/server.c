@@ -5,11 +5,12 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Thu Feb  4 00:56:40 2016 marc brout
+** Last update Thu Feb  4 18:02:50 2016 marc brout
 */
 
 #include <sys/types.h>
 #include <signal.h>
+#include <time.h>
 #include <unistd.h>
 #include "minitalk.h"
 #include "my.h"
@@ -49,6 +50,9 @@ void		new_client(int client, int *size)
   *size += 1;
   if (change_tab(*size, 1))
     exit(1);
+  usleep(100);
+  if (g_pidtab[0] > 1)
+    kill(g_pidtab[0], SIGUSR2);
   g_pidtab[*size - 1] = client;
 }
 
@@ -58,9 +62,9 @@ void		end_client(char c, int *size)
     {
       *size -= 1;
       write(1, "\n", 1);
-      kill(g_pidtab[0], SIGUSR2);
       if (change_tab(*size, 0))
 	exit(1);
+      usleep(1);
     }
 }
 
@@ -72,7 +76,7 @@ void		receive(int nb, siginfo_t *siginfo, UNUSED void *data)
   char		tmp;
 
   if (siginfo->si_pid != g_pidtab[0])
-    new_client(siginfo->si_pid, &size);  
+    new_client(siginfo->si_pid, &size);
   else if (g_pidtab[0] > 1)
     {
       tmp = 1;
@@ -87,26 +91,27 @@ void		receive(int nb, siginfo_t *siginfo, UNUSED void *data)
 	}
     }
   if (g_pidtab[0] > 1)
-    {
-      usleep(1);
-      kill(g_pidtab[0], SIGUSR1);
-    }
+    kill(g_pidtab[0], SIGUSR1);
 }
 
 int			main()
 {
   struct sigaction	act;
+  struct timespec	reg;
 
   if (!(g_pidtab = malloc(sizeof(int))))
     return (1);
   g_pidtab[0] = -1;
   act.sa_sigaction = &receive;
   act.sa_flags = SA_SIGINFO;
+  reg.tv_sec = 0;
+  reg.tv_nsec = 15000000;
   my_printf("%d\n", getpid());
-  if (sigaction(SIGUSR1, &act, NULL) < 0 ||
-      sigaction(SIGUSR2, &act, NULL) < 0)
+  if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
     return (1);
   while (42)
-    pause();
+    if (!nanosleep(&reg, NULL))
+      if (g_pidtab[0] > 1)
+	kill(g_pidtab[0], SIGUSR1);
   return (0);
 }
