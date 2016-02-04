@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:59:52 2016 marc brout
-** Last update Wed Feb  3 17:23:01 2016 marc brout
+** Last update Thu Feb  4 00:01:38 2016 marc brout
 */
 
 #ifndef MINITALK_H_
