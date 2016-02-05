@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Thu Feb  4 18:02:50 2016 marc brout
+** Last update Fri Feb  5 18:34:23 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -64,7 +64,7 @@ void		end_client(char c, int *size)
       write(1, "\n", 1);
       if (change_tab(*size, 0))
 	exit(1);
-      usleep(1);
+      usleep(100);
     }
 }
 
@@ -97,21 +97,18 @@ void		receive(int nb, siginfo_t *siginfo, UNUSED void *data)
 int			main()
 {
   struct sigaction	act;
-  struct timespec	reg;
 
   if (!(g_pidtab = malloc(sizeof(int))))
     return (1);
   g_pidtab[0] = -1;
   act.sa_sigaction = &receive;
   act.sa_flags = SA_SIGINFO;
-  reg.tv_sec = 0;
-  reg.tv_nsec = 15000000;
   my_printf("%d\n", getpid());
   if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
     return (1);
   while (42)
-    if (!nanosleep(&reg, NULL))
+    if (!sleep(1))
       if (g_pidtab[0] > 1)
-	kill(g_pidtab[0], SIGUSR1);
+    	kill(g_pidtab[0], SIGUSR1);
   return (0);
 }

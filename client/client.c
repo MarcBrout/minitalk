@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Thu Feb  4 18:21:53 2016 marc brout
+** Last update Thu Feb  4 18:42:31 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -90,8 +90,6 @@ int			main(int ac, char **av, char **ae)
   if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
     return (1);
   kill(nb, SIGUSR1);
-  while (!sleep(1))
-    kill(nb, SIGUSR1);
   pause();
   while (av[2][++i])
     read_str(av[2][i], nb);

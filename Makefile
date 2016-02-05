@@ -1,30 +1,30 @@
 ##
-## Makefile for minitalk in /home/brout_m/rendu/projet/System_unix/minitalk
+## Makefile for mysh
 ## 
 ## Made by marc brout
 ## Login   <brout_m@epitech.net>
 ## 
-## Started on  Fri Jan 29 15:30:38 2016 marc brout
-## Last update Wed Feb  3 16:42:53 2016 marc brout
+## Started on  Sun Jan 24 02:16:48 2016 marc brout
+## Last update Fri Feb  5 18:31:23 2016 marc brout
 ##
 
-SRCP	= ./srv/
+SRCP	= client/
 
-SRCP2	= ./cli/
+SRCPSRV	= server/
 
-SRC     = $(SRCP)server.c
+SRC     = $(SRCP)client.c \
 
-SRC2     = $(SRCP2)client.c
+SRCSRV  = $(SRCPSRV)server.c \
 
 OBJS    = $(SRC:.c=.o)
 
-OBJS2	= $(SRC2:.c=.o)
+OBJSRV  = $(SRCSRV:.c=.o)
 
-NAME    = server
+NAME    = client/client
 
-NAME2	= client
+SERVER	= server/server
 
-CC      = gcc -g
+CC      = gcc
 
 CFLAGS  =  -W -Wall -Werror
 
@@ -34,23 +34,25 @@ LDFLAGS = -L./lib/ -lmy
 
 RM      = rm -f
 
+.phony: client/client server/server
+
 .c.o:
 	$(CC) -c $< -o $@ $(HDFLAGS) $(CFLAGS)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(SERVER)
 	$(CC) -o $(NAME) $(OBJS) $(LDFLAGS)
 
-$(NAME2): $(OBJS2)
-	$(CC) -o $(NAME2) $(OBJS2) $(LDFLAGS)
+$(SERVER): $(OBJSRV)
+	$(CC) -o $(SERVER) $(OBJSRV) $(LDFLAGS)
 
-all: $(NAME) $(NAME2)
+all: $(NAME) $(SERVER)
 
 clean:
 	$(RM) $(OBJS)
-	$(RM) $(OBJS2)
+	$(RM) $(OBJSRV)
 
 fclean: clean
 	$(RM) $(NAME)
-	$(RM) $(NAME2)
+	$(RM) $(SERVER)
 
 re: fclean all
