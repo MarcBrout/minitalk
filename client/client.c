@@ -5,15 +5,14 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Mon Feb  8 11:08:34 2016 marc brout
+** Last update Mon Feb  8 15:34:08 2016 marc brout
 */
 
 #include <sys/types.h>
 #include <signal.h>
 #include <unistd.h>
-#include "minitalk.h"
-#include "my.h"
-#define CLIENT
+#include <stdlib.h>
+#include "minitalk_client.h"
 
 t_client	g_client;
 
@@ -39,21 +38,15 @@ int		check_args(int ac, char **av, char **ae)
   return (nb);
 }
 
-void		ignore(int nb, siginfo_t *siginfo, UNUSED void *data)
+void		ignore(int nb)
 {
-  static int	server = 0;
   static int	i = 0;
   static int	j = 0;
 
-  if (!server)
+  if (nb == SIGUSR1)
     {
-      server = siginfo->si_pid;
-      g_client.gotit = 1;
-    }
-  if (siginfo->si_pid == server && nb == SIGUSR1)
-    {
-      (g_client.message[i] & (1u << j)) ?
-      kill(server, SIGUSR1) : kill(server, SIGUSR2);
+      (g_client.message[i] & (1u << j)) ? kill(g_client.server, SIGUSR1) :
+	kill(g_client.server, SIGUSR2);
       j += 1;
       if (!g_client.message[i] && j == 8)
 	exit(0);
@@ -65,25 +58,43 @@ void		ignore(int nb, siginfo_t *siginfo, UNUSED void *data)
     }
 }
 
+void			send_char(char c)
+{
+  int			j;
+
+  j = -1;
+  while (++j < 8)
+    {
+      (c & (1u << j)) ? kill(g_client.server, SIGUSR1) :
+	kill(g_client.server, SIGUSR2);
+      usleep(0);
+    }
+}
+
+void			send_pid(char *pid)
+{
+  int			i;
+
+  i = -1;
+  while (pid[++i]);
+  while (--i >= 0)
+    send_char(pid[i]);
+  send_char(0);
+}
+
 int			main(int ac, char **av, char **ae)
 {
-  struct sigaction	act;
-  int			nb;
+  char			*pid;
 
-  if ((nb = check_args(ac, av, ae)) < 0)
+  if ((g_client.server = check_args(ac, av, ae)) < 0 ||
+      !(pid = put_nb_to_str(getpid())))
     return (1);
-  g_client.gotit = 0;
   g_client.message = av[2];
-  act.sa_sigaction = &ignore;
-  act.sa_flags = SA_SIGINFO;
-  if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
+  if (signal(SIGUSR1, &ignore) == SIG_ERR ||
+      signal(SIGUSR2, &ignore) == SIG_ERR)
     return (1);
-  while (g_client.gotit == 0)
-    {
-      kill(nb, SIGUSR1);
-      sleep(1);
-    }
+  send_pid(pid);
   while (42)
-    sleep(10);
+    sleep(3);
   return (0);
 }

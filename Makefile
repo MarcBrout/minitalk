@@ -5,7 +5,7 @@
 ## Login   <brout_m@epitech.net>
 ## 
 ## Started on  Sun Jan 24 02:16:48 2016 marc brout
-## Last update Mon Feb  8 11:38:10 2016 marc brout
+## Last update Mon Feb  8 15:17:11 2016 marc brout
 ##
 
 SRCP		= client/
@@ -17,8 +17,11 @@ SRCPBONUSSRV	= bonus/server/
 SRCPBONUSCLI	= bonus/client/
 
 SRC     	= $(SRCP)client.c \
+		$(SRCP)my_putnbr_to_str.c \
+		$(SRCP)my_getnbr.c
 
 SRCSRV  	= $(SRCPSRV)server.c \
+		$(SRCPSRV)my_put_nbr.c
 
 SRCBONUSSRV 	= $(SRCPBONUSSRV)server.c \
 
@@ -32,7 +35,7 @@ BONUSOBJSSRV	= $(SRCBONUSSRV:.c=.o)
 
 BONUSOBJSCLI	= $(SRCBONUSCLI:.c=.o)
 
-NAME    	= client/client
+CLIENT    	= client/client
 
 SERVER		= server/server
 
@@ -46,7 +49,7 @@ CFLAGS  	=  -W -Wall -Werror
 
 HDFLAGS 	= -I./include/
 
-LDFLAGS 	= -L./lib/ -lmy
+LDFLAGS 	= 
 
 RM      	= rm -f
 
@@ -55,21 +58,21 @@ RM      	= rm -f
 .c.o:
 	$(CC) -c $< -o $@ $(HDFLAGS) $(CFLAGS)
 
-$(NAME): $(OBJS) $(SERVER)
-	$(CC) -o $(NAME) $(OBJS) $(LDFLAGS)
+$(CLIENT): $(OBJS) $(SERVER)
+	$(CC) -o $(CLIENT) $(OBJS) $(LDFLAGS)
 
 $(SERVER): $(OBJSRV)
 	$(CC) -o $(SERVER) $(OBJSRV) $(LDFLAGS)
 
-$(BONUSSRV): $(BONUSOBJSSRV) $(BONUSCLI)
-	$(CC) -o $(BONUSSRV) $(BONUSOBJSSRV) $(LDFLAGS)
-
-$(BONUSCLI): $(BONUSOBJSCLI)
+$(BONUSCLI): $(BONUSSRV) $(BONUSOBJSCLI)
 	$(CC) -o $(BONUSCLI) $(BONUSOBJSCLI) $(LDFLAGS)
 
-bonus: $(BONUSSRV) $(BONUSCLI)
+$(BONUSSRV): $(BONUSOBJSSRV)
+	$(CC) -o $(BONUSSRV) $(BONUSOBJSSRV) $(LDFLAGS)
 
-all: $(NAME) $(SERVER)
+all: $(CLIENT) $(SERVER)
+
+bonus: $(BONUSCLI) $(BONUSSRV)
 
 clean:
 	$(RM) $(OBJS)
@@ -78,7 +81,7 @@ clean:
 	$(RM) $(BONUSOBJSCLI)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(CLIENT)
 	$(RM) $(SERVER)
 	$(RM) $(BONUSCLI)
 	$(RM) $(BONUSSRV)

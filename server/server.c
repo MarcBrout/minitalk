@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Mon Feb  8 11:01:19 2016 marc brout
+** Last update Mon Feb  8 15:26:04 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -13,115 +13,74 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
-#include "minitalk.h"
-#include "my.h"
-#define SERVER
+#include "minitalk_server.h"
 
-t_server	g_serv;
+t_server	g_server;
 
-char		change_tab(int size, int action)
+void		get_pid(int nb)
 {
-  int		*tmp;
-  int		j;
-  int		i;
+  static int	pow = 1;
+  static char	c = 0;
+  static int	i = 0;
 
-  if (!(tmp = malloc(sizeof(int) * (size + 1))))
-    return (1);
-  if (action)
+  if (nb == SIGUSR1)
+    c = c | (1u << i);
+  i += 1;
+  if (i == 8)
     {
-      i = -1;
-      while (g_serv.pidtab[++i] != -1)
-	tmp[i] = g_serv.pidtab[i];
-      tmp[size] = -1;
-    }
-  else
-    {
+      if (c == 0)
+	{
+	  g_server.go = 1;
+	  c = 0;
+	  i = 0;
+	  pow = 1;
+	  return ;
+	}
+      g_server.client += (c - 48) * pow;
+      c = 0;
       i = 0;
-      j = -1;
-      while (g_serv.pidtab[++i] != -1)
-	tmp[++j] = g_serv.pidtab[i];
-      tmp[size] = -1;
-    }
-  free(g_serv.pidtab);
-  g_serv.pidtab = tmp;
-  return (0);
-}
-
-void		new_client(int client)
-{
-  int		i;
-
-  i = -1;
-  while (g_serv.pidtab[++i] != -1)
-    if (g_serv.pidtab[i] == client)
-      break;
-  if (g_serv.pidtab[i] == -1)
-    {
-      kill(client, SIGUSR2);
-      g_serv.size += 1;
-      if (change_tab(g_serv.size, 1))
-	exit(1);
-      g_serv.pidtab[g_serv.size - 1] = client;
+      pow *= 10;
     }
 }
 
-void		end_client()
-{
-  g_serv.size -= 1;
-  write(1, "\n", 1);
-  if (change_tab(g_serv.size, 0))
-    exit(1);
-}
-
-void		receive(int nb, siginfo_t *siginfo, UNUSED void *data)
+void		receive(int nb)
 {
   static char	c = 0;
   static int	i = 0;
-  char		tmp;
 
-  if (g_serv.timeout && !(c = 0) && !(i = 0))
-    g_serv.timeout = 0;
-  if (siginfo->si_pid != g_serv.pidtab[0])
-    new_client(siginfo->si_pid);
-  else if (g_serv.pidtab[0] > 1)
+  if (nb == SIGUSR1)
+    c = c | (1u << i);
+  i += 1;
+  if (i == 8 && write(1, &c, 1) >= 0)
     {
-      tmp = 1;
-      if (nb == SIGUSR1)
-	c = c | (tmp << i);
-      i += 1;
-      if (i == 8 && write(1, &c, 1) >= 0)
-	{
-	  if (c == 0)
-	    end_client();
-	  c = 0;
-	  i = 0;
-	}
+      if (c == 0)
+	g_server.go = 0;
+      c = 0;
+      i = 0;
     }
-  if (g_serv.pidtab[0] > 1)
-    kill(g_serv.pidtab[0], SIGUSR1);
+  kill(g_server.client, SIGUSR1);
 }
 
 int			main()
 {
-  struct sigaction	act;
-
-  if (!(g_serv.pidtab = malloc(sizeof(int))))
-    return (1);
-  g_serv.timeout = 0;
-  g_serv.pidtab[0] = -1;
-  g_serv.size = 0;
-  act.sa_sigaction = &receive;
-  act.sa_flags = SA_SIGINFO;
-  my_printf("%d\n", getpid());
-  if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
-    return (1);
+  my_put_nbr(getpid());
+  write(1, "\n", 1);
   while (42)
-    if (!sleep(3) && g_serv.pidtab[0] > 1)
-      {
-	g_serv.timeout = 1;
-	change_tab(--g_serv.size, 0);
-	if (g_serv.pidtab[0] > 1)
-	  kill(g_serv.pidtab[0], SIGUSR1);
-      }
+    {
+      g_server.client = 0;
+      g_server.go = 0;
+      if (signal(SIGUSR1, &get_pid) == SIG_ERR ||
+	  signal(SIGUSR2, &get_pid) == SIG_ERR)
+	return (1);
+      while (!g_server.go)
+	sleep(3);
+      if (signal(SIGUSR1, &receive) == SIG_ERR ||
+	  signal(SIGUSR2, &receive) == SIG_ERR)
+	return (1);
+      kill(g_server.client, SIGUSR1);
+      while (g_server.go)
+	if (!sleep(3))
+	  break;
+    }
   return (0);
 }

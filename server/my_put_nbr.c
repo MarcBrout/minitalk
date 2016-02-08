@@ -5,21 +5,18 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Mon Oct 12 19:37:45 2015 marc brout
-** Last update Sat Oct 17 22:59:13 2015 marc brout
+** Last update Mon Feb  8 15:00:40 2016 marc brout
 */
+
+#include <unistd.h>
 
 int	my_put_nbr(int nb)
 {
-  int	unit;
   int	power;
   int	stock;
+  char	c;
 
   power = 1;
-  if (nb < 0)
-    {
-      my_putchar('-');
-      nb = -nb;
-    }
   stock = nb;
   while ((nb / 10) > 0)
     {
@@ -28,10 +25,12 @@ int	my_put_nbr(int nb)
     }
   while ((power / 10) > 0)
     {
-      my_putchar((stock / power) + 48);
+      c = (stock / power) + 48;
+      write(1, &c, 1);
       stock = stock - ((stock / power) * power);
       power = power / 10;
     }
-  my_putchar((stock % 10) + 48);
+  c = (stock % 10) + 48;
+  write(1, &c, 1);
   return (0);
 }

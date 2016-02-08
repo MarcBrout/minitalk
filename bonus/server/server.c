@@ -5,17 +5,16 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Mon Feb  8 11:24:05 2016 marc brout
+** Last update Mon Feb  8 15:30:09 2016 marc brout
 */
 
+#include <stdlib.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
-#include "minitalk_bonus.h"
-#include "my.h"
-#define SERVER
+#include "minitalk_bonus_server.h"
 
 t_server	g_serv;
 
@@ -112,7 +111,7 @@ int			main()
   g_serv.size = 0;
   act.sa_sigaction = &receive;
   act.sa_flags = SA_SIGINFO;
-  my_printf("%d\n", getpid());
+  printf("%d\n", getpid());
   if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
     return (1);
   while (42)

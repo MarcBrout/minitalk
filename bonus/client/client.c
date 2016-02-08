@@ -5,15 +5,14 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Mon Feb  8 11:23:48 2016 marc brout
+** Last update Mon Feb  8 15:29:59 2016 marc brout
 */
 
+#include <stdlib.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <unistd.h>
-#include "minitalk_bonus.h"
-#include "my.h"
-#define CLIENT
+#include "minitalk_bonus_client.h"
 
 t_client	g_client;
 
@@ -31,7 +30,7 @@ int		check_args(int ac, char **av, char **ae)
       write(2, "Missing environnement variables.\n", 34);
       return (-1);
     }
-  if ((nb = my_getnbr(av[1])) < 2)
+  if ((nb = atoi(av[1])) < 2)
     {
       write(2, "Wrong PID.\n", 12);
       return (-1);
