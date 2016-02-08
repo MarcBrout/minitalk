@@ -5,41 +5,43 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:59:52 2016 marc brout
-** Last update Thu Feb  4 17:09:37 2016 marc brout
+** Last update Mon Feb  8 11:18:02 2016 marc brout
 */
 
 #ifndef MINITALK_H_
 # define MINITALK_H_
+
 # define UNUSED __attribute__((__unused__))
 
-/*
-** Structure décomposée d'un character :
-*/
+# ifndef SERVER
+#  define SERVER
 
-typedef struct		s_bit
+typedef struct		s_server
 {
-  unsigned int		one : 1;
-  unsigned int		two : 1;
-  unsigned int		tre : 1;
-  unsigned int		fou : 1;
-  unsigned int		fiv : 1;
-  unsigned int		six : 1;
-  unsigned int		sev : 1;
-  unsigned int		eig : 1;
-}			t_bit;
+  int			size;
+  int			*pidtab;
+  char			timeout;
+}			t_server;
 
-/*
-** Union de la structure t_bit et d'un character :
-*/
+char change_tab(int, int);
+void new_client(int);
+void end_client();
+void receive(int, siginfo_t *, void *);
 
-typedef union		u_char
+# endif /* !SERVER */
+
+# ifndef CLIENT
+#  define CLIENT
+
+typedef struct		s_client
 {
-  char			c;
-  t_bit			bits;
-}			t_char;
+  char			*message;
+  char			gotit;
+}			t_client;
 
-/*
-** Prototypes de fonctions :
-*/
+int check_args(int, char **, char **);
+void ignore(int, siginfo_t *, void *);
+
+# endif /* !CLIENT */
 
 #endif /* !MINITALK_H_ */
