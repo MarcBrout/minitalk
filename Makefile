@@ -5,36 +5,52 @@
 ## Login   <brout_m@epitech.net>
 ## 
 ## Started on  Sun Jan 24 02:16:48 2016 marc brout
-## Last update Fri Feb  5 18:31:23 2016 marc brout
+## Last update Mon Feb  8 11:38:10 2016 marc brout
 ##
 
-SRCP	= client/
+SRCP		= client/
 
-SRCPSRV	= server/
+SRCPSRV		= server/
 
-SRC     = $(SRCP)client.c \
+SRCPBONUSSRV	= bonus/server/
 
-SRCSRV  = $(SRCPSRV)server.c \
+SRCPBONUSCLI	= bonus/client/
 
-OBJS    = $(SRC:.c=.o)
+SRC     	= $(SRCP)client.c \
 
-OBJSRV  = $(SRCSRV:.c=.o)
+SRCSRV  	= $(SRCPSRV)server.c \
 
-NAME    = client/client
+SRCBONUSSRV 	= $(SRCPBONUSSRV)server.c \
 
-SERVER	= server/server
+SRCBONUSCLI	= $(SRCPBONUSCLI)client.c \
 
-CC      = gcc
+OBJS    	= $(SRC:.c=.o)
 
-CFLAGS  =  -W -Wall -Werror
+OBJSRV  	= $(SRCSRV:.c=.o)
 
-HDFLAGS = -I./include/
+BONUSOBJSSRV	= $(SRCBONUSSRV:.c=.o)
 
-LDFLAGS = -L./lib/ -lmy
+BONUSOBJSCLI	= $(SRCBONUSCLI:.c=.o)
 
-RM      = rm -f
+NAME    	= client/client
 
-.phony: client/client server/server
+SERVER		= server/server
+
+BONUSSRV	= bonus/server/server
+
+BONUSCLI	= bonus/client/client
+
+CC      	= gcc
+
+CFLAGS  	=  -W -Wall -Werror
+
+HDFLAGS 	= -I./include/
+
+LDFLAGS 	= -L./lib/ -lmy
+
+RM      	= rm -f
+
+.phony: client/client server/server bonus/client/client bonus/server/server
 
 .c.o:
 	$(CC) -c $< -o $@ $(HDFLAGS) $(CFLAGS)
@@ -45,14 +61,26 @@ $(NAME): $(OBJS) $(SERVER)
 $(SERVER): $(OBJSRV)
 	$(CC) -o $(SERVER) $(OBJSRV) $(LDFLAGS)
 
+$(BONUSSRV): $(BONUSOBJSSRV) $(BONUSCLI)
+	$(CC) -o $(BONUSSRV) $(BONUSOBJSSRV) $(LDFLAGS)
+
+$(BONUSCLI): $(BONUSOBJSCLI)
+	$(CC) -o $(BONUSCLI) $(BONUSOBJSCLI) $(LDFLAGS)
+
+bonus: $(BONUSSRV) $(BONUSCLI)
+
 all: $(NAME) $(SERVER)
 
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(OBJSRV)
+	$(RM) $(BONUSOBJSSRV)
+	$(RM) $(BONUSOBJSCLI)
 
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) $(SERVER)
+	$(RM) $(BONUSCLI)
+	$(RM) $(BONUSSRV)
 
 re: fclean all
