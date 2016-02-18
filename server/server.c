@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Mon Feb  8 15:26:04 2016 marc brout
+** Last update Tue Feb  9 16:12:31 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -74,6 +74,7 @@ int			main()
 	return (1);
       while (!g_server.go)
 	sleep(3);
+      usleep(50);
       if (signal(SIGUSR1, &receive) == SIG_ERR ||
 	  signal(SIGUSR2, &receive) == SIG_ERR)
 	return (1);

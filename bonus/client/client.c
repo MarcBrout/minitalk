@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Mon Feb  8 15:29:59 2016 marc brout
+** Last update Thu Feb 18 23:34:53 2016 marc brout
 */
 
 #include <stdlib.h>
@@ -83,6 +83,7 @@ int			main(int ac, char **av, char **ae)
       sleep(1);
     }
   while (42)
-    sleep(10);
+    if (!sleep(120))
+      break;
   return (0);
 }

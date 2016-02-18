@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Mon Feb  8 15:34:08 2016 marc brout
+** Last update Thu Feb 18 23:31:37 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -67,7 +67,7 @@ void			send_char(char c)
     {
       (c & (1u << j)) ? kill(g_client.server, SIGUSR1) :
 	kill(g_client.server, SIGUSR2);
-      usleep(0);
+      usleep(10000);
     }
 }
 
@@ -95,6 +95,7 @@ int			main(int ac, char **av, char **ae)
     return (1);
   send_pid(pid);
   while (42)
-    sleep(3);
+    if (!sleep(5))
+      break;
   return (0);
 }
