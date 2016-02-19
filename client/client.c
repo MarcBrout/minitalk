@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Thu Feb 18 23:31:37 2016 marc brout
+** Last update Fri Feb 19 16:20:52 2016 marc brout
 */
 
 #include <sys/types.h>
@@ -49,7 +49,10 @@ void		ignore(int nb)
 	kill(g_client.server, SIGUSR2);
       j += 1;
       if (!g_client.message[i] && j == 8)
-	exit(0);
+	{
+	  free(g_client.pid);
+	  exit(0);
+	}
       if (j == 8)
 	{
 	  i += 1;
@@ -84,18 +87,18 @@ void			send_pid(char *pid)
 
 int			main(int ac, char **av, char **ae)
 {
-  char			*pid;
-
   if ((g_client.server = check_args(ac, av, ae)) < 0 ||
-      !(pid = put_nb_to_str(getpid())))
+      !(g_client.pid = put_nb_to_str(getpid())))
     return (1);
   g_client.message = av[2];
   if (signal(SIGUSR1, &ignore) == SIG_ERR ||
       signal(SIGUSR2, &ignore) == SIG_ERR)
     return (1);
-  send_pid(pid);
+  send_pid(g_client.pid);
   while (42)
-    if (!sleep(5))
+    if (!sleep(3))
       break;
+  if (g_client.pid)
+    free(g_client.pid);
   return (0);
 }

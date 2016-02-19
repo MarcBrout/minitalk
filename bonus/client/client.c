@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 20:37:18 2016 marc brout
-** Last update Fri Feb 19 15:13:09 2016 marc brout
+** Last update Fri Feb 19 16:05:05 2016 marc brout
 */
 
 #include <stdlib.h>
@@ -49,7 +49,7 @@ void		ignore(int nb, siginfo_t *siginfo, UNUSED void *data)
       server = siginfo->si_pid;
       g_client.gotit = 1;
     }
-  else if (g_client.gotit && siginfo->si_pid == server && nb == SIGUSR1)
+  if (g_client.gotit && siginfo->si_pid == server && nb == SIGUSR1)
     {
       (g_client.message[i] & (1u << j)) ?
       kill(server, SIGUSR1) : kill(server, SIGUSR2);
@@ -73,6 +73,7 @@ int			main(int ac, char **av, char **ae)
     return (1);
   g_client.gotit = 0;
   g_client.message = av[2];
+  sigemptyset(&act.sa_mask);
   act.sa_sigaction = &ignore;
   act.sa_flags = SA_SIGINFO;
   if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
@@ -84,9 +85,9 @@ int			main(int ac, char **av, char **ae)
       sleep(2);
     }
   while (42)
-    if (!sleep(10))
+    if (!sleep(5))
       {
-	write(2, "Timed out (10s).\n", 17); 
+	write(2, "Timed out (5s).\n", 16);
 	break;
       }
   return (0);

@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Mon Feb  8 15:20:17 2016 marc brout
-** Last update Mon Feb  8 15:21:39 2016 marc brout
+** Last update Fri Feb 19 16:19:08 2016 marc brout
 */
 
 #ifndef MINITALK_CLIENT_H_
@@ -13,6 +13,7 @@
 
 typedef struct	s_client
 {
+  char		*pid;
   int		server;
   char		*message;
 }		t_client;

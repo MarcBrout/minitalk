@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Fri Feb 19 14:58:09 2016 marc brout
+** Last update Fri Feb 19 16:01:13 2016 marc brout
 */
 
 #include <stdlib.h>
@@ -113,6 +113,7 @@ int			main()
   g_serv.timeout = 0;
   g_serv.pidtab[0] = -1;
   g_serv.size = 0;
+  sigemptyset(&act.sa_mask);
   act.sa_sigaction = &receive;
   act.sa_flags = SA_SIGINFO;
   printf("%d\n", getpid());
@@ -124,7 +125,7 @@ int			main()
 	g_serv.timeout = 1;
 	g_serv.ret = 0;
 	change_tab(--g_serv.size, 0);
-	usleep(1000);
+	usleep(10000);
 	if (g_serv.pidtab[0] > 1)
 	  kill(g_serv.pidtab[0], SIGUSR1);
       }
