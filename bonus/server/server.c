@@ -5,7 +5,7 @@
 ** Login   <brout_m@epitech.net>
 ** 
 ** Started on  Fri Jan 29 15:36:56 2016 marc brout
-** Last update Mon Feb  8 15:30:09 2016 marc brout
+** Last update Fri Feb 19 14:58:09 2016 marc brout
 */
 
 #include <stdlib.h>
@@ -46,7 +46,7 @@ char		change_tab(int size, int action)
   return (0);
 }
 
-void		new_client(int client)
+int		new_client(int client)
 {
   int		i;
 
@@ -56,18 +56,21 @@ void		new_client(int client)
       break;
   if (g_serv.pidtab[i] == -1)
     {
+      usleep(10000);
       kill(client, SIGUSR2);
       g_serv.size += 1;
       if (change_tab(g_serv.size, 1))
 	exit(1);
       g_serv.pidtab[g_serv.size - 1] = client;
+      if (i > 0)
+	return (1);
     }
+  return (0);
 }
 
 void		end_client()
 {
   g_serv.size -= 1;
-  write(1, "\n", 1);
   if (change_tab(g_serv.size, 0))
     exit(1);
 }
@@ -78,10 +81,11 @@ void		receive(int nb, siginfo_t *siginfo, UNUSED void *data)
   static int	i = 0;
   char		tmp;
 
+  g_serv.ret = 0;
   if (g_serv.timeout && !(c = 0) && !(i = 0))
     g_serv.timeout = 0;
   if (siginfo->si_pid != g_serv.pidtab[0])
-    new_client(siginfo->si_pid);
+    g_serv.ret = new_client(siginfo->si_pid);
   else if (g_serv.pidtab[0] > 1)
     {
       tmp = 1;
@@ -96,7 +100,7 @@ void		receive(int nb, siginfo_t *siginfo, UNUSED void *data)
 	  i = 0;
 	}
     }
-  if (g_serv.pidtab[0] > 1)
+  if (g_serv.pidtab[0] > 1 && !g_serv.ret)
     kill(g_serv.pidtab[0], SIGUSR1);
 }
 
@@ -115,10 +119,12 @@ int			main()
   if (sigaction(SIGUSR1, &act, NULL) < 0 || sigaction(SIGUSR2, &act, NULL) < 0)
     return (1);
   while (42)
-    if (!sleep(3) && g_serv.pidtab[0] > 1)
+    if (!sleep(2) && g_serv.pidtab[0] > 1)
       {
 	g_serv.timeout = 1;
+	g_serv.ret = 0;
 	change_tab(--g_serv.size, 0);
+	usleep(1000);
 	if (g_serv.pidtab[0] > 1)
 	  kill(g_serv.pidtab[0], SIGUSR1);
       }
